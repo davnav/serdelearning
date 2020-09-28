@@ -19,16 +19,34 @@ static json1:&str= r#"{
 #[derive(Debug,Deserialize)]
 pub struct JsonStruct<'a>{
     #[serde(borrow)]
-    foo:Vec<&'a str>,
+    pub foo:Vec<&'a str>,
     count:i32,
     //#[serde(borrow)]
-    data: User<'a>,
-    authorized:bool,
+    pub data: User<'a>,
+    pub authorized:bool,
 }
+
+///if you want to define a field which has different name
+/// #[serde(rename="original json key")]
+/// the above attribute needs to be used.
+/// below struct has field "fun" for the jason key "foo"
+#[derive(Debug,Deserialize)]
+pub struct JsonStruct2<'a>{
+    #[serde(borrow)]
+    #[serde(rename="foo")]
+    pub fun:Vec<&'a str>,
+    count:i32,
+    //#[serde(borrow)]
+    pub data: User<'a>,
+    pub authorized:bool,
+}
+///if you want to define a field which has different name
+/// below struct has field "fun" for the jason key "foo"
+///   
 
 #[derive(Debug,Deserialize)]
 pub struct User<'a>{
-    user:&'a str,
+    pub user:&'a str,
     age:i32,
 }
 
@@ -42,4 +60,11 @@ mod tests {
         let deserialized:JsonStruct = serde_json::from_str(json1).unwrap();
         println!{"{:?},{},{}",deserialized.foo[0],deserialized.authorized,deserialized.data.user};
     }
+    #[test]
+    fn json_test_exampl2() {
+
+        let deserialized:JsonStruct2 = serde_json::from_str(json1).unwrap();
+        println!{"{:?},{},{}",deserialized.fun[0],deserialized.authorized,deserialized.data.user};
+    }
+
 }
