@@ -43,7 +43,23 @@ pub struct JsonStruct2<'a>{
 ///if you want to define a field which has different name
 /// below struct has field "fun" for the jason key "foo"
 ///   
-
+///JsonStruct3 example , we are dealing with skipping some fields
+///Some fields are in the json data might not needed for us, so we can simply
+/// skip them using #[serde(skip)] attribute
+#[derive(Debug,Deserialize)]
+pub struct JsonStruct3<'a>{
+    #[serde(borrow)]
+    #[serde(rename="foo")]
+    pub fun:Vec<&'a str>,
+    #[serde(skip)]
+    count:i32,
+    //#[serde(borrow)]
+    pub data: User<'a>,
+    pub authorized:bool,
+}
+///if you want to define a field which has different name
+/// below struct has field "fun" for the jason key "foo"
+///   
 #[derive(Debug,Deserialize)]
 pub struct User<'a>{
     pub user:&'a str,
@@ -61,10 +77,19 @@ mod tests {
         println!{"{:?},{},{}",deserialized.foo[0],deserialized.authorized,deserialized.data.user};
     }
     #[test]
-    fn json_test_exampl2() {
+    fn json_test_rename_field() {
 
         let deserialized:JsonStruct2 = serde_json::from_str(json1).unwrap();
-        println!{"{:?},{},{}",deserialized.fun[0],deserialized.authorized,deserialized.data.user};
+        println!("{:?},{},{},{}",deserialized.fun[0],deserialized.authorized,deserialized.data.user,deserialized.count);
     }
+
+    #[test]
+    fn json_test_skip_field() {
+
+        let deserialized:JsonStruct3 = serde_json::from_str(json1).unwrap();
+        println!("{:?},{},{},{}",deserialized.fun[0],deserialized.authorized,deserialized.data.user,deserialized.count);
+    }
+
+
 
 }
