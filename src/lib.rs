@@ -12,6 +12,14 @@ static json1:&str= r#"{
     
 }"#;
 
+static json2:&str= r#"{
+       "FOO":["bar","baz"],
+        "COUNT":32,
+        "DATA":{"user":"Naveen","age":34},
+        "AUTHORIZED":true 
+    
+}"#;
+
 
 ///For the example1 json data can be represented as below in rust struct.
 /// Since &str inside the vector require lifetime, this needs to explicitly borrowed.
@@ -51,12 +59,35 @@ pub struct JsonStruct3<'a>{
     #[serde(borrow)]
     #[serde(rename="foo")]
     pub fun:Vec<&'a str>,
-    #[serde(skip)]
+   // #[serde(skip)]
     count:i32,
     //#[serde(borrow)]
     pub data: User<'a>,
     pub authorized:bool,
 }
+
+///rename all fields with some specifics
+/// in this case json data should have rust struct's fields 
+/// uppercase corresponding keys.Our data is below and keys are uppercase
+/// static json2:&str= r#"{
+///             "FOO":["bar","baz"],
+///             "COUNT":32,          
+///             "DATA":{"user":"Naveen","age":34},
+///             "AUTHORIZED":true 
+/// }"#;
+/// 
+#[derive(Debug,Deserialize)]
+#[serde(rename_all="UPPERCASE")]
+pub struct JsonStruct4<'a>{
+    #[serde(borrow)]
+    pub foo :Vec<&'a str>,
+    count:i32,
+    //#[serde(borrow)]
+    pub DATA : User<'a>,
+    pub AUTHORIZED:bool,
+}
+
+
 ///if you want to define a field which has different name
 /// below struct has field "fun" for the jason key "foo"
 ///   
@@ -70,7 +101,7 @@ pub struct User<'a>{
 #[cfg(test)]
 mod tests {
     use super::*;
-    #[test]
+     #[test]
     fn json_test_exampl1() {
 
         let deserialized:JsonStruct = serde_json::from_str(json1).unwrap();
@@ -86,10 +117,16 @@ mod tests {
     #[test]
     fn json_test_skip_field() {
 
-        let deserialized:JsonStruct3 = serde_json::from_str(json1).unwrap();
+        let deserialized:JsonStruct3 = serde_json::from_str(&json1).unwrap();
         println!("{:?},{},{},{}",deserialized.fun[0],deserialized.authorized,deserialized.data.user,deserialized.count);
     }
 
+    #[test]
+     fn json_test_rename_all_fields() {
+
+        let deserialized:JsonStruct4 = serde_json::from_str(&json2).unwrap();
+        println!("{:?},{},{}",deserialized.foo[0],deserialized.AUTHORIZED,deserialized.DATA.user);
+    }
 
 
 }

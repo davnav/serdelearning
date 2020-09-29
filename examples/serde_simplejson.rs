@@ -10,6 +10,6 @@ static json1:&str= r#"{
 
 fn main(){
 
-    let deserialized:JsonStruct = serde_json::from_str(json1).unwrap();
-    println!{"{:?},{},{}",deserialized.foo[0],deserialized.authorized,deserialized.data.user};
+  //  let deserialized:JsonStruct = serde_json::from_str(json1).unwrap();
+  //  println!{"{:?},{},{}",deserialized.foo[0],deserialized.authorized,deserialized.data.user};
 }
