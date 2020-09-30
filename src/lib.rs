@@ -20,7 +20,20 @@ static json2:&str= r#"{
     
 }"#;
 
+///adding the attribute #serde(tag="type") shows the json internally tagged
+#[derive(Serialize,Deserialize,Debug)]
+#[serde(tag="type")]
+pub enum Message{
+    Request{ id:String,method:String,params:Params},
+    Response{id:String,result:Value},
+}
 
+#[derive(Serialize,Deserialize,Debug)]
+pub struct Params{
+    users:String,
+    name:String,    
+
+} 
 ///For the example1 json data can be represented as below in rust struct.
 /// Since &str inside the vector require lifetime, this needs to explicitly borrowed.
 /// Note the json field key values and struct type should match
@@ -78,6 +91,7 @@ pub struct JsonStruct3<'a>{
 /// 
 #[derive(Debug,Deserialize)]
 #[serde(rename_all="UPPERCASE")]
+#[serde(deny_unknown_fields)]
 pub struct JsonStruct4<'a>{
     #[serde(borrow)]
     pub foo :Vec<&'a str>,
@@ -128,5 +142,21 @@ mod tests {
         println!("{:?},{},{}",deserialized.foo[0],deserialized.AUTHORIZED,deserialized.DATA.user);
     }
 
+    #[test]
+     fn json_test_enum_tag() {
+
+        let mes = Message::Request{id:"1".to_string(),method:"post".to_string(),params:Params{users:"US".to_string(),name:"naveen".to_string()}};
+        let serialized = serde_json::to_string(&mes).unwrap();
+        ///internal representation of json will have type as key 
+        println!("{:?}",serialized);
+
+        let deserialized:Message = serde_json::from_str(&serialized).unwrap();
+        ///deserialized json get printed
+        println!("{:?}",deserialized);
+    }
+
 
 }
+
+
+
